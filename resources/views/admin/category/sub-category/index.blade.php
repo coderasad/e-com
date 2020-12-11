@@ -1,0 +1,120 @@
+@extends('admin.admin_layout')
+@push('css')
+  <link href="{{asset('public/backend/lib/datatables/jquery.dataTables.css')}}" rel="stylesheet">
+  <link href="{{asset('public/backend/lib/select2/css/select2.min.css')}}" rel="stylesheet">
+@endpush
+@section('admin_content')
+
+  <!-- ########## START: MAIN PANEL ########## -->
+  <div class="sl-mainpanel">
+    <div class="sl-pagebody">
+      <div class="sl-page-title">
+        <h5>Sub-Category Table</h5>
+      </div><!-- sl-page-title -->
+      <div class="card pd-20 pd-sm-40">
+        <h6 class="card-body-title">Sub-category List
+          <a data-toggle="modal" data-target="#insert" href="#" class="btn rounded btn-warning float-right font-weight-bold">Add New</a>
+        </h6>
+        <div class="table-wrapper">
+          <table id="datatable1" class="table display responsive nowrap text-center">
+            <thead>
+              <tr>
+                <th style="width:10%">Sl No</th>
+                <th style="width:35%">Category Name</th>
+                <th style="width:35%">Sub-Category Name</th>
+                <th style="width:20%">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach ($subcategory as $data)
+                <tr>
+                  <td>{{ $count++ }}</td>
+                  <td>{{ $data->cat->category_name }}</td>
+                  <td>{{ $data->subcategory_name }}</td>
+                  <td>
+                    <div class="btn-group-sm" style="float: none;">
+                      <a href="{{ url('admin/subcategory/'.$data->id.'/edit') }}" class="btn btn-sm btn-info" style="float: none; margin: 5px;"><span class="fa fa-pencil text-light"></span></a>
+
+                      <a data-toggle="modal" data-target="#deleteModal" href=" {{URL::to('admin/subcategory/'.$data->id.'/destroy')}} " class="btn btn-sm btn-danger deleteModal" style="float: none; margin: 5px;"><span class="fa fa-trash text-light"></span></a>
+                    </div>
+                  </td>
+                </tr>
+              @endforeach  
+            </tbody>
+          </table>
+        </div><!-- table-wrapper -->
+      </div><!-- card -->      
+    </div><!-- sl-mainpanel -->
+  </div>
+  <!-- ########## END: MAIN PANEL ########## -->
+
+  <!-- Model Insert -->
+  <div class="modal fade" id="insert" tabindex="-1" role="dialog" aria-labelledby="insertModalLabe" aria-hidden="true">
+    <div class="modal-dialog w-100" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="insertModalLabe">Sub-category Add</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>     
+        <form action="subcategory" method="post">
+          @csrf
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">Sub-Category Name</label>
+              <input type="text" class="form-control @error ('subcategory_name') is-invalid @enderror" value="{{ old ('subcategory_name') }}" id="recipient-name" name="subcategory_name">
+              @error('subcategory_name')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+              @enderror
+            </div>
+            <div class="form-group">
+              <label for="category-name" class="col-form-label">Category Name</label>
+              <select name="category_name" id="category-name" class="form-control @error ('category_name') is-invalid @enderror">                
+                <option value="0">Select Category</option>
+                @foreach ($category as $data)
+                  <option value="{{ $data->id }}">{{ $data->category_name }}</option>  
+                @endforeach
+              </select>
+              @error('category_name')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+                @enderror
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-warning rounded">Add</button>
+            <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+@endsection
+@push('js')
+  <script src="{{asset('public/backend/lib/datatables/jquery.dataTables.js')}}"></script>
+  <script src="{{asset('public/backend/lib/select2/js/select2.min.js')}}"></script> 
+  <script>
+    $(function(){
+      'use strict';
+
+      $('#datatable1').DataTable({
+        responsive: true,
+        language: {
+          searchPlaceholder: 'Search...',
+          sSearch: '',
+          lengthMenu: '_MENU_ items/page',
+        }
+      });
+
+      // Select2
+      $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity });
+
+    });
+  </script>
+@endpush
